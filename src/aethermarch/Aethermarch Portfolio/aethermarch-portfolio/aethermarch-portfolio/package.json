@@ -1,0 +1,18 @@
+{
+  "name": "chronicles-of-aethermarch",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A noir magitek JRPG narrative prototype built in React.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {}
+}
