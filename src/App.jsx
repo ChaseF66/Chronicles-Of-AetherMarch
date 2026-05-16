@@ -5,6 +5,7 @@ import { useState } from "react";
 import Scene01 from "./scenes/Scene01";
 import Scene02 from "./scenes/Scene02";
 import Scene03 from "./scenes/Scene03";
+import TitleScreen from "./scenes/TitleScreen";
 
 // ── GLOBAL STYLES & FONTS ─────────────────────────────────────────────────────
 const fontLink = document.createElement("link");
@@ -60,7 +61,14 @@ function ComingSoon({ screen, onBack }) {
 // ── MAIN APP ──────────────────────────────────────────────────────────────────
 export default function App() {
   // screen: "scene01" | "title" | "jobselect" | "map" | "battle" | "scene02"
-  const [screen, setScreen] = useState("scene01");
+  const [screen, setScreen] = useState("title");
+
+  if (screen === "title") {
+    return <TitleScreen
+      onNewGame={() => setScreen("scene01")}
+      onContinue={() => setScreen("scene01")}
+    />;
+  }
 
   // Route to the right screen
   if (screen === "scene01") {
