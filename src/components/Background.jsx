@@ -12,6 +12,9 @@ export default function Background({ id }) {
     "district-streets":{ bg:"radial-gradient(ellipse at 40% 60%, #1a0f0a 0%, #0d0a06 60%, #000 100%)", elements:"district-streets" },
     "pip-entrance":   { bg:"radial-gradient(ellipse at 50% 80%, #0a1208 0%, #060a05 60%, #000 100%)",  elements:"pip" },
     "workshop":       { bg:"radial-gradient(ellipse at 30% 50%, #0f0a1a 0%, #080610 60%, #000 100%)",  elements:"workshop" },
+    "flashback":      { bg:"radial-gradient(ellipse at 50% 40%, #2a1e08 0%, #1a1205 60%, #0a0800 100%)", elements:"flashback" },
+    "bar":            { bg:"radial-gradient(ellipse at 30% 60%, #0f0a08 0%, #080605 60%, #000 100%)",   elements:"bar" },
+    "workshop-dark":  { bg:"radial-gradient(ellipse at 50% 50%, #050508 0%, #020203 100%)",             elements:"none" },
     "black":          { bg:"#000", elements:"none" },
   };
 
@@ -206,6 +209,42 @@ export default function Background({ id }) {
           <polygon points="0,120 0,60 200,40 400,55 600,35 800,50 800,120" fill="#1a0808"/>
         </svg>
       )}
-    </div>
+      {/* Flashback — warm workshop */}
+      {cfg.elements === "flashback" && (
+        <>
+          <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at 50% 30%, #3a2a0a 0%, transparent 60%)", opacity:0.4 }}/>
+          <svg style={{ position:"absolute", bottom:0, left:0, width:"100%", height:"40%", opacity:.25 }} viewBox="0 0 800 200" preserveAspectRatio="none">
+            <rect x="100" y="80" width="600" height="8" fill="#4a3a1a"/>
+            {Array.from({length:8},(_,i) => (
+              <rect key={i} x={120+i*80} y={40+Math.floor(i/4)*30} width={30+i%3*10} height={35} fill="#3a2a10"/>
+            ))}
+          </svg>
+          {[20,40,60,75,88].map((pct,i) => (
+            <div key={i} style={{
+              position:"absolute", top:`${10+i*8}%`, left:`${pct}%`,
+              width:3, height:3, borderRadius:"50%", background:"#c8a84b",
+              boxShadow:`0 0 6px #c8a84b`,
+              animation:`conduitPulse ${2+i*0.3}s ease-in-out infinite`,
+              animationDelay:`${i*0.4}s`,
+            }}/>
+          ))}
+        </>
+      )}
+
+      {/* Bar — Ryker's scene */}
+      {cfg.elements === "bar" && (
+        <>
+          <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at 30% 70%, #1a0f08 0%, transparent 50%)", opacity:0.6 }}/>
+          <svg style={{ position:"absolute", bottom:0, left:0, width:"100%", height:"35%", opacity:.3 }} viewBox="0 0 800 140" preserveAspectRatio="none">
+            <rect x="0" y="60" width="800" height="8" fill="#2a1a10"/>
+            {Array.from({length:6},(_,i) => (
+              <rect key={i} x={50+i*120} y={20} width={15} height={40} fill="#1a0f08"/>
+            ))}
+          </svg>
+          <div style={{ position:"absolute", bottom:"35%", right:"15%", width:40, height:60, background:"linear-gradient(180deg, #2a1a08, #1a0f05)", border:"1px solid #3a2a18" }}/>
+          <div style={{ position:"absolute", bottom:"40%", right:"16%", width:36, height:24, background:"linear-gradient(180deg, #c8a84b44, #e8c86844)", animation:"pulse 3s ease-in-out infinite", borderRadius:2 }}/>
+        </>
+      )}
+</div>
   );
 }
