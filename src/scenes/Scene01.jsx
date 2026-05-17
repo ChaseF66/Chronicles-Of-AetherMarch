@@ -5,6 +5,9 @@ import { useState, useEffect, useRef } from "react";
 import Background from "../components/Background";
 import { SCENE_01 } from "../data/scenes";
 import { CHAR_COLOR } from "../data/characters";
+import { useAudio, TRACKS } from "../hooks/useAudio";
+
+
 
 // ── TYPEWRITER HOOK ───────────────────────────────────────────────────────────
 function useTypewriter(text, speed=22, onDone) {
@@ -157,6 +160,7 @@ function ProgressBar({ current, total }) {
 
 // ── MAIN SCENE 01 COMPONENT ───────────────────────────────────────────────────
 export default function Scene01({ onComplete }) {
+  useAudio(TRACKS.SCENE_01);
   const [beatIndex, setBeatIndex] = useState(0);
   const [bgFade, setBgFade] = useState(false);
   const beat = SCENE_01[beatIndex];

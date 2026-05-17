@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import Background from "../components/Background";
 import { SCENE_02_PRE, SCENE_02_TUTORIAL, SCENE_02_POST } from "../data/scenes";
 import { CHAR_COLOR, JOBS, SKILLS, ENEMY_TEMPLATES, calcDmg, calcHeal, makeChar, makeEnemy, roll } from "../data/characters";
+import { useAudio, TRACKS } from "../hooks/useAudio";
 
 // ── FONTS (inherited from App.jsx) ────────────────────────────────────────────
 const WRAITH_ENEMY = {
@@ -358,6 +359,9 @@ function TutorialBattle({ onVictory, onDefeat }) {
 
 // ── MAIN SCENE 02 ─────────────────────────────────────────────────────────────
 export default function Scene02({ onComplete }) {
+  useAudio(TRACKS.SCENE_02);
+
+  
   // phase: "pre" | "tutorial" | "battle" | "post"
   const [phase, setPhase] = useState("pre");
   const [beatIndex, setBeatIndex] = useState(0);

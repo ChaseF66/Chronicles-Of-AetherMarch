@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Background from "../components/Background";
+import { useAudio, TRACKS, shiftToEmotional, shiftBack } from "../hooks/useAudio";
 import {
   SCENE_03_PRE,
   SCENE_03_FLASHBACK,
@@ -362,6 +363,7 @@ function SlaterBoss({ onVictory, onDefeat }) {
 
 // ── MAIN SCENE 03 ─────────────────────────────────────────────────────────────
 export default function Scene03({ onComplete }) {
+  useAudio(TRACKS.SCENE_03);
   const PHASES = ["pre", "flashback", "post_flashback", "ryker", "chase", "battle", "escape"];
   const [phaseIdx, setPhaseIdx] = useState(0);
   const [beatIndex, setBeatIndex] = useState(0);
@@ -388,11 +390,17 @@ export default function Scene03({ onComplete }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [beatIndex, phase, phaseIdx]);
 
-  function nextPhase() {
-    if (phaseIdx >= PHASES.length - 1) { onComplete(); return; }
-    setBgFade(true);
-    setTimeout(() => { setPhaseIdx(i => i + 1); setBeatIndex(0); setBgFade(false); }, 400);
-  }
+function nextPhase() {
+  if (phaseIdx >= PHASES.length - 1) { onComplete(); return; }
+  const next = PHASES[phaseIdx + 1];
+
+  // Audio shifts — emotional vs intense
+  if (["flashback", "ryker", "escape"].includes(next)) shiftToEmotional();
+  if (["post_flashback", "chase", "battle"].includes(next)) shiftBack(TRACKS.SCENE_03);
+
+  setBgFade(true);
+  setTimeout(() => { setPhaseIdx(i => i + 1); setBeatIndex(0); setBgFade(false); }, 400);
+}
 
   function advance() {
     if (beat?.type === "hardcut") { setShowHardCut(true); return; }

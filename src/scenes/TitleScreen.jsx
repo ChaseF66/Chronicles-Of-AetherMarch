@@ -1,72 +1,70 @@
 // ─── CHRONICLES OF AETHERMARCH ───────────────────────────────────────────────
-// TitleScreen.jsx — The main title screen
+// TitleScreen.jsx — Rebuilt title screen
 
 import { useState, useEffect, useRef } from "react";
+import { useAudio, stopAudio, TRACKS } from "../hooks/useAudio";
+
+// ── AETHER CRACK PARTICLE ─────────────────────────────────────────────────────
+function AetherCrack({ x, y, angle, length, opacity, delay }) {
+  const x2 = x + Math.cos(angle) * length;
+  const y2 = y + Math.sin(angle) * length;
+  const mx = x + Math.cos(angle) * length * 0.4 + (Math.random() - 0.5) * 20;
+  const my = y + Math.sin(angle) * length * 0.4 + (Math.random() - 0.5) * 20;
+  return (
+    <path
+      d={`M${x},${y} Q${mx},${my} ${x2},${y2}`}
+      stroke="#4af0e0"
+      strokeWidth={0.8}
+      fill="none"
+      opacity={opacity}
+      style={{
+        animation: `aetherPulse ${2 + Math.random() * 2}s ease-in-out infinite`,
+        animationDelay: `${delay}s`,
+      }}
+    />
+  );
+}
+
+// ── GENERATE CRACKS ───────────────────────────────────────────────────────────
+function generateCracks(count) {
+  return Array.from({ length: count }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    y: 50 + Math.random() * 50,
+    angle: (Math.random() * Math.PI * 2),
+    length: 20 + Math.random() * 60,
+    opacity: 0.1 + Math.random() * 0.3,
+    delay: Math.random() * 3,
+  }));
+}
+
+const CRACKS = generateCracks(35);
 
 export default function TitleScreen({ onNewGame, onContinue }) {
   const [phase, setPhase] = useState(0);
   const [hoveredItem, setHoveredItem] = useState(null);
-  const [tick, setTick] = useState(0);
-  const audioRef = useRef(null);
 
-  // Staggered reveal
+  useAudio(TRACKS.TITLE);
+
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 500),   // city fades in
-      setTimeout(() => setPhase(2), 1500),  // title appears
-      setTimeout(() => setPhase(3), 2800),  // tagline appears
-      setTimeout(() => setPhase(4), 4000),  // menu appears
+      setTimeout(() => setPhase(1), 400),
+      setTimeout(() => setPhase(2), 1200),
+      setTimeout(() => setPhase(3), 2400),
+      setTimeout(() => setPhase(4), 3600),
     ];
     return () => timers.forEach(clearTimeout);
   }, []);
 
-  // Audio — Cyan Crucible
-  useEffect(() => {
-    const audio = new Audio("/audio/cyan-crucible.mp3");
-    audio.loop = true;
-    audio.volume = 0;
-    audioRef.current = audio;
-
-    // Fade in volume slowly
-    audio.play().then(() => {
-      let vol = 0;
-      const fadeIn = setInterval(() => {
-        vol = Math.min(vol + 0.02, 0.7);
-        audio.volume = vol;
-        if (vol >= 0.7) clearInterval(fadeIn);
-      }, 100);
-    }).catch(() => {
-      // Browser autoplay blocked — play on first click instead
-      const unlock = () => {
-        audio.play();
-        window.removeEventListener("click", unlock);
-      };
-      window.addEventListener("click", unlock);
-    });
-
-    return () => {
-      audio.pause();
-      audio.src = "";
-    };
-  }, []);
-
-  // Fade out music before transitioning
   function fadeOutAndGo(action) {
-    const audio = audioRef.current;
-    if (!audio) { action(); return; }
-    let vol = audio.volume;
-    const fadeOut = setInterval(() => {
-      vol = Math.max(vol - 0.05, 0);
-      audio.volume = vol;
-      if (vol <= 0) { clearInterval(fadeOut); audio.pause(); action(); }
-    }, 50);
+    stopAudio(action);
   }
 
   const menuItems = [
-    { label: "NEW GAME",  action: () => fadeOutAndGo(onNewGame),   icon: "⚙" },
-    { label: "CONTINUE",  action: () => fadeOutAndGo(onContinue),  icon: "▶" },
-    { label: "SETTINGS",  action: null,        icon: "◈" },
-    { label: "CREDITS",   action: null,        icon: "✦" },
+    { label: "NEW GAME",  action: () => fadeOutAndGo(onNewGame),  icon: "⚙" },
+    { label: "CONTINUE",  action: () => fadeOutAndGo(onContinue), icon: "▶" },
+    { label: "SETTINGS",  action: null, icon: "◈" },
+    { label: "CREDITS",   action: null, icon: "✦" },
   ];
 
   return (
@@ -77,185 +75,124 @@ export default function TitleScreen({ onNewGame, onContinue }) {
       fontFamily: "'Cinzel', serif",
     }}>
 
-      {/* ── BACKGROUND LAYERS ── */}
+      {/* ── REAL BACKGROUND IMAGE ── */}
+      <div style={{
+        position: "fixed", inset: 0,
+        backgroundImage: 'url("/art/title-screen-bg.png")',
+        backgroundSize: "85%",
+        backgroundPosition: "center 0%",
+        backgroundRepeat: "no-repeat",
+        opacity: phase >= 1 ? 0.9 : 0,
+        transition: "opacity 2.5s ease",
+        zIndex: 0,
+      }}/>
 
-      {/* Base sky gradient */}
+      {/* ── DARK VIGNETTE — bottom heavy to anchor menu ── */}
       <div style={{
         position: "absolute", inset: 0,
-        background: "radial-gradient(ellipse at 50% 0%, #1a2a3a 0%, #080c14 50%, #000 100%)",
-        opacity: phase >= 1 ? 1 : 0,
-        transition: "opacity 2s ease",
+        background: "radial-gradient(ellipse at 50% 30%, transparent 20%, rgba(0,0,0,0.55) 100%)",
+        pointerEvents: "none",
       }}/>
 
-      {/* Upper district glow */}
+      {/* ── BOTTOM DARK GRADIENT — menu readability ── */}
       <div style={{
-        position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
-        width: "60%", height: "40%",
-        background: "radial-gradient(ellipse at 50% 0%, #c8a84b22 0%, transparent 70%)",
-        opacity: phase >= 1 ? 1 : 0,
-        transition: "opacity 2.5s ease",
+        position: "absolute", bottom: 0, left: 0, right: 0, height: "55%",
+        background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)",
+        pointerEvents: "none",
       }}/>
 
-      {/* Smog layer */}
-      <div style={{
-        position: "absolute", top: "30%", left: 0, right: 0, height: "25%",
-        background: "linear-gradient(180deg, transparent 0%, #1a1208 40%, #0a0805 60%, transparent 100%)",
-        opacity: phase >= 1 ? 0.7 : 0,
-        transition: "opacity 2s ease",
-      }}/>
-
-      {/* City skyline SVG */}
+      {/* ── AETHER CRACKS — contaminated energy bleeding through ── */}
       <svg style={{
-        position: "absolute", bottom: 0, left: 0, width: "100%", height: "55%",
-        opacity: phase >= 1 ? 0.5 : 0,
+        position: "absolute", inset: 0,
+        width: "100%", height: "100%",
+        opacity: phase >= 2 ? 1 : 0,
         transition: "opacity 2s ease",
-      }} viewBox="0 0 1400 500" preserveAspectRatio="none">
-        {/* Far background buildings */}
-        {[
-          [0,200,80,300],[85,150,60,350],[150,180,90,320],[245,120,70,380],
-          [320,200,80,300],[405,160,65,340],[475,140,85,360],[565,180,75,320],
-          [645,120,60,380],[710,200,90,300],[805,160,70,340],[880,140,80,360],
-          [965,180,65,320],[1035,120,75,380],[1115,200,80,300],[1200,160,85,340],
-          [1290,140,110,360],
-        ].map(([x,h,w,y],i) => (
-          <rect key={i} x={x} y={y} width={w} height={h} fill="#0a1020"/>
-        ))}
-        {/* Aethon towers — taller, prominent */}
-        {[
-          [580,320,40,180],[620,280,30,220],[650,300,35,200],
-          [760,340,45,160],[805,300,30,200],
-        ].map(([x,h,w,y],i) => (
-          <rect key={`tower-${i}`} x={x} y={y} width={w} height={h} fill="#0d1525"/>
-        ))}
-        {/* Windows — aether tinted */}
-        {Array.from({length:80},(_,i) => (
-          <rect key={`win-${i}`}
-            x={10+(i*17)%1380} y={100+(i*23)%320}
-            width={5} height={8}
-            fill={i%5===0 ? "#4af0e0" : i%3===0 ? "#e8b84b" : "#1a2a4a"}
-            opacity={0.15+((i*7)%10)*0.04}
+        pointerEvents: "none",
+      }}>
+        <defs>
+          <style>{`
+            @keyframes aetherPulse {
+              0%, 100% { opacity: 0; }
+              50% { opacity: 1; }
+            }
+          `}</style>
+        </defs>
+        {CRACKS.map(c => (
+          <AetherCrack key={c.id}
+            x={`${c.x}%`} y={`${c.y}%`}
+            angle={c.angle} length={c.length}
+            opacity={c.opacity} delay={c.delay}
           />
         ))}
-        {/* Ground aether conduits */}
-        {[5,15,25,35,45,55,65,75,85,95].map((pct,i) => (
-          <rect key={`conduit-${i}`}
-            x={`${pct}%`} y={490} width={2} height={10}
-            fill="#4af0e0" opacity={0.3}
-          />
-        ))}
+        {/* Ground aether conduit line */}
+        <line x1="0" y1="99%" x2="100%" y2="99%"
+          stroke="#4af0e0" strokeWidth="0.5" opacity="0.2"
+          style={{ animation: "aetherPulse 4s ease-in-out infinite" }}
+        />
       </svg>
 
-      {/* Aether conduit lines — horizontal */}
-      <div style={{
-        position: "absolute", bottom: "2%", left: 0, right: 0, height: 1,
-        background: "linear-gradient(90deg, transparent 0%, #4af0e044 20%, #4af0e088 50%, #4af0e044 80%, transparent 100%)",
-        opacity: phase >= 1 ? 1 : 0,
-        transition: "opacity 2s ease",
-        animation: "conduitPulse 3s ease-in-out infinite",
-      }}/>
-
-      {/* Steam particles */}
-      {phase >= 1 && Array.from({length:12},(_,i) => (
-        <div key={i} style={{
-          position: "absolute",
-          left: `${5+i*8}%`,
-          bottom: `${8+i*2}%`,
-          width: 6+i*2, height: 6+i*2,
-          borderRadius: "50%",
-          background: "#aaccbb",
-          opacity: 0,
-          animation: `steamDrift ${4+i*0.6}s ease-out infinite`,
-          animationDelay: `${i*0.4}s`,
-        }}/>
-      ))}
-
-      {/* Scanlines */}
+      {/* ── SCANLINES ── */}
       <div style={{
         position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2,
-        background: "repeating-linear-gradient(0deg, transparent, transparent 3px, #00000015 3px, #00000015 4px)",
-      }}/>
-
-      {/* Grain */}
-      <div style={{
-        position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2, opacity: 0.03,
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-        backgroundSize: "200px",
+        background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)",
       }}/>
 
       {/* ── TITLE CONTENT ── */}
       <div style={{
-        position: "absolute", inset: 0, zIndex: 10,
+        position: "fixed", inset: 0, zIndex: 10,
         display: "flex", flexDirection: "column",
-        alignItems: "center", justifyContent: "center",
+        alignItems: "center", justifyContent: "flex-end",
+        paddingBottom: "3vh",
         gap: 0,
       }}>
 
-        {/* Gear decorations */}
-        <div style={{
-          fontSize: 20, letterSpacing: 24, opacity: 0.4,
-          marginBottom: 8,
-          opacity: phase >= 2 ? 0.4 : 0,
-          transform: phase >= 2 ? "translateY(0)" : "translateY(-10px)",
-          transition: "all 0.8s ease",
-          color: "#c8a84b",
-        }}>⚙ ⚙ ⚙</div>
-
         {/* CHRONICLES OF */}
         <div style={{
-          fontSize: 13, letterSpacing: 10, color: "#7a9aaa",
-          marginBottom: 4,
+          fontFamily: "'Share Tech Mono', monospace",
+          fontSize: "clamp(10px, 1.1vw, 13px)",
+          letterSpacing: "clamp(6px, 1.8vw, 16px)",
+          color: "rgba(74,240,224,0.7)",
           opacity: phase >= 2 ? 1 : 0,
-          transform: phase >= 2 ? "translateY(0)" : "translateY(10px)",
-          transition: "all 0.8s ease 0.1s",
+          transform: phase >= 2 ? "translateY(0)" : "translateY(8px)",
+          transition: "all 0.9s ease 0.1s",
+          marginBottom: "8px",
+          textShadow: "0 0 10px rgba(74,240,224,0.3)",
+          display: "none"
         }}>CHRONICLES OF</div>
 
-        {/* AETHERMARCH — main title */}
+        {/* Divider */}
         <div style={{
-          fontSize: "clamp(36px, 7vw, 72px)",
-          fontWeight: 600,
-          letterSpacing: 8,
-          color: "#e8b84b",
-          textShadow: `
-            0 0 20px #e8b84b88,
-            0 0 40px #c8a84b44,
-            0 0 80px #a88a3a22
-          `,
-          marginBottom: 6,
-          opacity: phase >= 2 ? 1 : 0,
-          transform: phase >= 2 ? "translateY(0)" : "translateY(10px)",
-          transition: "all 1s ease 0.2s",
-          animation: phase >= 2 ? "flicker 4s ease-in-out infinite" : "none",
-        }}>AETHERMARCH</div>
-
-        {/* Divider line */}
-        <div style={{
-          width: phase >= 2 ? "40%" : "0%",
-          height: 1,
-          background: "linear-gradient(90deg, transparent, #c8a84b88, transparent)",
-          marginBottom: 12,
-          transition: "width 1.2s ease 0.4s",
+          width: phase >= 2 ? "clamp(200px, 35%, 420px)" : "0%",
+          height: "1px",
+          background: "linear-gradient(90deg, transparent, rgba(74,240,224,0.4), transparent)",
+          marginBottom: "14px",
+          transition: "width 1.2s ease 0.5s",
+          display: "none"
         }}/>
 
         {/* Tagline */}
         <div style={{
           fontFamily: "'IM Fell English', serif",
           fontStyle: "italic",
-          fontSize: 14,
-          color: "#5a7a6a",
-          letterSpacing: 1,
-          marginBottom: 48,
+          fontSize: "clamp(11px, 1.3vw, 15px)",
+          color: "rgba(74,240,224,0.55)",
+          letterSpacing: "1px",
+          marginBottom: "clamp(32px, 5vh, 56px)",
           opacity: phase >= 3 ? 1 : 0,
           transform: phase >= 3 ? "translateY(0)" : "translateY(8px)",
           transition: "all 0.8s ease",
+          textShadow: "0 0 8px rgba(74,240,224,0.2)",
+          display: "none"
         }}>
           "Aethermarch doesn't make heroes. It makes us."
         </div>
 
-        {/* Menu items */}
+        {/* Menu — horizontal layout */}
         <div style={{
-          display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+          display: "flex", flexDirection: "row",
+          alignItems: "center", gap: "8px",
           opacity: phase >= 4 ? 1 : 0,
-          transform: phase >= 4 ? "translateY(0)" : "translateY(12px)",
+          transform: phase >= 4 ? "translateY(0)" : "translateY(10px)",
           transition: "all 0.8s ease",
         }}>
           {menuItems.map((item, i) => {
@@ -268,50 +205,37 @@ export default function TitleScreen({ onNewGame, onContinue }) {
                 onMouseEnter={() => setHoveredItem(i)}
                 onMouseLeave={() => setHoveredItem(null)}
                 style={{
-                  display: "flex", alignItems: "center", gap: 12,
-                  padding: "10px 32px",
+                  display: "flex", alignItems: "center",
+                  padding: "8px 20px",
                   cursor: isDisabled ? "default" : "pointer",
-                  opacity: isDisabled ? 0.35 : 1,
+                  opacity: isDisabled ? 0.3 : 1,
                   transition: "all 0.15s ease",
                   position: "relative",
-                  minWidth: 220,
-                  justifyContent: "center",
                 }}
               >
-                {/* Hover border */}
+                {/* Separator between items */}
+                {i > 0 && (
+                  <div style={{
+                    position: "absolute", left: 0,
+                    top: "20%", height: "60%", width: "1px",
+                    background: "rgba(74,240,224,0.2)",
+                  }}/>
+                )}
+                {/* Hover bg */}
                 {isHovered && !isDisabled && (
                   <div style={{
                     position: "absolute", inset: 0,
-                    border: "1px solid #e8b84b44",
-                    background: "linear-gradient(90deg, transparent, #e8b84b08, transparent)",
+                    background: "rgba(74,240,224,0.06)",
+                    border: "1px solid rgba(74,240,224,0.25)",
                     pointerEvents: "none",
                   }}/>
                 )}
-
-                {/* Left indicator */}
                 <span style={{
                   fontFamily: "'Share Tech Mono', monospace",
-                  fontSize: 10,
-                  color: isHovered && !isDisabled ? "#e8b84b" : "transparent",
-                  transition: "color 0.15s",
-                  position: "absolute", left: 8,
-                }}>▶</span>
-
-                {/* Icon */}
-                <span style={{
-                  fontFamily: "'Share Tech Mono', monospace",
-                  fontSize: 11,
-                  color: isHovered && !isDisabled ? "#e8b84b" : "#4a6a5a",
-                  transition: "color 0.15s",
-                }}>{item.icon}</span>
-
-                {/* Label */}
-                <span style={{
-                  fontFamily: "'Press Start 2P', monospace",
-                  fontSize: 10,
-                  letterSpacing: 3,
-                  color: isHovered && !isDisabled ? "#e8b84b" : "#5a7a6a",
-                  textShadow: isHovered && !isDisabled ? "0 0 12px #e8b84b66" : "none",
+                  fontSize: "clamp(9px, 1vw, 12px)",
+                  letterSpacing: "3px",
+                  color: isHovered && !isDisabled ? "#4af0e0" : "rgba(200,220,218,0.75)",
+                  textShadow: isHovered && !isDisabled ? "0 0 10px rgba(74,240,224,0.5)" : "none",
                   transition: "all 0.15s",
                 }}>{item.label}</span>
               </div>
@@ -319,29 +243,25 @@ export default function TitleScreen({ onNewGame, onContinue }) {
           })}
         </div>
 
-        {/* Version tag */}
+        {/* Version */}
         <div style={{
-          position: "absolute", bottom: 20, right: 24,
+          position: "absolute", bottom: "16px", right: "20px",
           fontFamily: "'Share Tech Mono', monospace",
-          fontSize: 9, letterSpacing: 2,
-          color: "#2a3a4a",
+          fontSize: "8px", letterSpacing: "2px",
+          color: "rgba(74,240,224,0.25)",
           opacity: phase >= 4 ? 1 : 0,
           transition: "opacity 1s ease",
-        }}>
-          v0.1.0 — ACT 1 PROLOGUE
-        </div>
+        }}>v0.1.0 — ACT 1 PROLOGUE</div>
 
-        {/* Bottom left lore tag */}
+        {/* Bottom left */}
         <div style={{
-          position: "absolute", bottom: 20, left: 24,
+          position: "absolute", bottom: "16px", left: "20px",
           fontFamily: "'Share Tech Mono', monospace",
-          fontSize: 9, letterSpacing: 2,
-          color: "#2a3a4a",
+          fontSize: "8px", letterSpacing: "2px",
+          color: "rgba(74,240,224,0.25)",
           opacity: phase >= 4 ? 1 : 0,
           transition: "opacity 1s ease",
-        }}>
-          DISTRICT 7 — AETHERMARCH
-        </div>
+        }}>DISTRICT 7 — AETHERMARCH</div>
 
       </div>
     </div>
