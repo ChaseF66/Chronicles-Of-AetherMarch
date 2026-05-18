@@ -1,7 +1,7 @@
 // ─── CHRONICLES OF AETHERMARCH ───────────────────────────────────────────────
-// TitleScreen.jsx — Rebuilt title screen
+// TitleScreen.jsx — Session 3 revamp v3
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useAudio, stopAudio, TRACKS } from "../hooks/useAudio";
 
 // ── AETHER CRACK PARTICLE ─────────────────────────────────────────────────────
@@ -61,10 +61,10 @@ export default function TitleScreen({ onNewGame, onContinue }) {
   }
 
   const menuItems = [
-    { label: "NEW GAME",  action: () => fadeOutAndGo(onNewGame),  icon: "⚙" },
-    { label: "CONTINUE",  action: () => fadeOutAndGo(onContinue), icon: "▶" },
-    { label: "SETTINGS",  action: null, icon: "◈" },
-    { label: "CREDITS",   action: null, icon: "✦" },
+    { label: "NEW GAME",  action: () => fadeOutAndGo(onNewGame)  },
+    { label: "CONTINUE",  action: () => fadeOutAndGo(onContinue) },
+    { label: "SETTINGS",  action: null },
+    { label: "CREDITS",   action: null },
   ];
 
   return (
@@ -87,21 +87,21 @@ export default function TitleScreen({ onNewGame, onContinue }) {
         zIndex: 0,
       }}/>
 
-      {/* ── DARK VIGNETTE — bottom heavy to anchor menu ── */}
+      {/* ── DARK VIGNETTE ── */}
       <div style={{
         position: "absolute", inset: 0,
         background: "radial-gradient(ellipse at 50% 30%, transparent 20%, rgba(0,0,0,0.55) 100%)",
         pointerEvents: "none",
       }}/>
 
-      {/* ── BOTTOM DARK GRADIENT — menu readability ── */}
+      {/* ── BOTTOM ATMOSPHERE ── */}
       <div style={{
-        position: "absolute", bottom: 0, left: 0, right: 0, height: "55%",
-        background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)",
+        position: "absolute", bottom: 0, left: 0, right: 0, height: "45%",
+        background: "linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.55) 40%, transparent 100%)",
         pointerEvents: "none",
       }}/>
 
-      {/* ── AETHER CRACKS — contaminated energy bleeding through ── */}
+      {/* ── AETHER CRACKS ── */}
       <svg style={{
         position: "absolute", inset: 0,
         width: "100%", height: "100%",
@@ -115,6 +115,14 @@ export default function TitleScreen({ onNewGame, onContinue }) {
               0%, 100% { opacity: 0; }
               50% { opacity: 1; }
             }
+            @keyframes chroniclesDrift {
+              0%, 100% { opacity: 0.7; }
+              50% { opacity: 0.9; }
+            }
+            @keyframes menuBreath {
+              0%, 100% { opacity: 0.85; }
+              50% { opacity: 1; }
+            }
           `}</style>
         </defs>
         {CRACKS.map(c => (
@@ -124,7 +132,6 @@ export default function TitleScreen({ onNewGame, onContinue }) {
             opacity={c.opacity} delay={c.delay}
           />
         ))}
-        {/* Ground aether conduit line */}
         <line x1="0" y1="99%" x2="100%" y2="99%"
           stroke="#4af0e0" strokeWidth="0.5" opacity="0.2"
           style={{ animation: "aetherPulse 4s ease-in-out infinite" }}
@@ -137,110 +144,124 @@ export default function TitleScreen({ onNewGame, onContinue }) {
         background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)",
       }}/>
 
-      {/* ── TITLE CONTENT ── */}
+      {/* ── CHRONICLES OF ──
+          Sits just above the painted AETHERMARCH logo.
+          The logo text in the image lives roughly 35–55% down the screen.
+          top: 33% lands us just above its upper edge.
+          translateX(-50%) centers it, slight tilt keeps it organic.
+      ── */}
+      <div style={{
+        position: "absolute",
+        top: "33%",
+        left: "50%",
+        transform: phase >= 2
+          ? "translateX(-50%) translateY(0px) rotate(-0.5deg)"
+          : "translateX(-50%) translateY(-12px) rotate(-0.5deg)",
+        zIndex: 10,
+        fontFamily: "'Share Tech Mono', monospace",
+        fontSize: "clamp(16px, 1.8vw, 24px)",
+        letterSpacing: "clamp(12px, 2.8vw, 32px)",
+        color: "rgba(74,240,224,0.72)",
+        textShadow: "0 0 24px rgba(74,240,224,0.25), 0 2px 10px rgba(0,0,0,0.9)",
+        opacity: phase >= 2 ? 1 : 0,
+        transition: "opacity 1.8s ease 0.4s, transform 1.8s ease 0.4s",
+        animation: phase >= 2 ? "chroniclesDrift 7s ease-in-out infinite" : "none",
+        pointerEvents: "none",
+        whiteSpace: "nowrap",
+        textAlign: "center",
+      }}>CHRONICLES OF</div>
+
+      {/* ── BOTTOM UI ZONE ── */}
       <div style={{
         position: "fixed", inset: 0, zIndex: 10,
         display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "flex-end",
-        paddingBottom: "3vh",
-        gap: 0,
+        paddingBottom: "8vh",
       }}>
 
-        {/* CHRONICLES OF */}
+        {/* Menu — atmospheric, no hard box */}
         <div style={{
-          fontFamily: "'Share Tech Mono', monospace",
-          fontSize: "clamp(10px, 1.1vw, 13px)",
-          letterSpacing: "clamp(6px, 1.8vw, 16px)",
-          color: "rgba(74,240,224,0.7)",
-          opacity: phase >= 2 ? 1 : 0,
-          transform: phase >= 2 ? "translateY(0)" : "translateY(8px)",
-          transition: "all 0.9s ease 0.1s",
-          marginBottom: "8px",
-          textShadow: "0 0 10px rgba(74,240,224,0.3)",
-          display: "none"
-        }}>CHRONICLES OF</div>
-
-        {/* Divider */}
-        <div style={{
-          width: phase >= 2 ? "clamp(200px, 35%, 420px)" : "0%",
-          height: "1px",
-          background: "linear-gradient(90deg, transparent, rgba(74,240,224,0.4), transparent)",
-          marginBottom: "14px",
-          transition: "width 1.2s ease 0.5s",
-          display: "none"
-        }}/>
-
-        {/* Tagline */}
-        <div style={{
-          fontFamily: "'IM Fell English', serif",
-          fontStyle: "italic",
-          fontSize: "clamp(11px, 1.3vw, 15px)",
-          color: "rgba(74,240,224,0.55)",
-          letterSpacing: "1px",
-          marginBottom: "clamp(32px, 5vh, 56px)",
-          opacity: phase >= 3 ? 1 : 0,
-          transform: phase >= 3 ? "translateY(0)" : "translateY(8px)",
-          transition: "all 0.8s ease",
-          textShadow: "0 0 8px rgba(74,240,224,0.2)",
-          display: "none"
-        }}>
-          "Aethermarch doesn't make heroes. It makes us."
-        </div>
-
-        {/* Menu — horizontal layout */}
-        <div style={{
-          display: "flex", flexDirection: "row",
-          alignItems: "center", gap: "8px",
           opacity: phase >= 4 ? 1 : 0,
-          transform: phase >= 4 ? "translateY(0)" : "translateY(10px)",
-          transition: "all 0.8s ease",
+          transform: phase >= 4 ? "translateY(0)" : "translateY(12px)",
+          transition: "all 1s ease",
+          animation: phase >= 4 ? "menuBreath 5s ease-in-out infinite" : "none",
+          display: "flex", flexDirection: "column",
+          alignItems: "center", gap: "10px",
         }}>
-          {menuItems.map((item, i) => {
-            const isHovered = hoveredItem === i;
-            const isDisabled = !item.action;
-            return (
-              <div
-                key={i}
-                onClick={() => item.action?.()}
-                onMouseEnter={() => setHoveredItem(i)}
-                onMouseLeave={() => setHoveredItem(null)}
-                style={{
-                  display: "flex", alignItems: "center",
-                  padding: "8px 20px",
-                  cursor: isDisabled ? "default" : "pointer",
-                  opacity: isDisabled ? 0.3 : 1,
-                  transition: "all 0.15s ease",
-                  position: "relative",
-                }}
-              >
-                {/* Separator between items */}
-                {i > 0 && (
-                  <div style={{
-                    position: "absolute", left: 0,
-                    top: "20%", height: "60%", width: "1px",
-                    background: "rgba(74,240,224,0.2)",
-                  }}/>
-                )}
-                {/* Hover bg */}
-                {isHovered && !isDisabled && (
-                  <div style={{
-                    position: "absolute", inset: 0,
-                    background: "rgba(74,240,224,0.06)",
-                    border: "1px solid rgba(74,240,224,0.25)",
-                    pointerEvents: "none",
-                  }}/>
-                )}
-                <span style={{
-                  fontFamily: "'Share Tech Mono', monospace",
-                  fontSize: "clamp(9px, 1vw, 12px)",
-                  letterSpacing: "3px",
-                  color: isHovered && !isDisabled ? "#4af0e0" : "rgba(200,220,218,0.75)",
-                  textShadow: isHovered && !isDisabled ? "0 0 10px rgba(74,240,224,0.5)" : "none",
-                  transition: "all 0.15s",
-                }}>{item.label}</span>
-              </div>
-            );
-          })}
+
+          {/* Soft line above */}
+          <div style={{
+            width: "clamp(160px, 22vw, 300px)",
+            height: "1px",
+            background: "linear-gradient(90deg, transparent, rgba(74,240,224,0.22), transparent)",
+          }}/>
+
+          {/* Menu row */}
+          <div style={{
+            display: "flex", flexDirection: "row",
+            alignItems: "center",
+            filter: "drop-shadow(0 0 20px rgba(0,0,0,0.95))",
+          }}>
+            {menuItems.map((item, i) => {
+              const isHovered = hoveredItem === i;
+              const isDisabled = !item.action;
+              return (
+                <div
+                  key={i}
+                  onClick={() => item.action?.()}
+                  onMouseEnter={() => setHoveredItem(i)}
+                  onMouseLeave={() => setHoveredItem(null)}
+                  style={{
+                    display: "flex", alignItems: "center",
+                    padding: "8px 28px",
+                    cursor: isDisabled ? "default" : "pointer",
+                    opacity: isDisabled ? 0.3 : 1,
+                    transition: "all 0.2s ease",
+                    position: "relative",
+                  }}
+                >
+                  {/* Barely-there separator */}
+                  {i > 0 && (
+                    <div style={{
+                      position: "absolute", left: 0,
+                      top: "20%", height: "60%", width: "1px",
+                      background: "rgba(74,240,224,0.1)",
+                    }}/>
+                  )}
+
+                  {/* Hover — soft radial glow, no box */}
+                  {isHovered && !isDisabled && (
+                    <div style={{
+                      position: "absolute", inset: "-6px -10px",
+                      background: "radial-gradient(ellipse at center, rgba(74,240,224,0.09) 0%, transparent 70%)",
+                      pointerEvents: "none",
+                    }}/>
+                  )}
+
+                  <span style={{
+                    fontFamily: "'Share Tech Mono', monospace",
+                    fontSize: "clamp(11px, 1.15vw, 15px)",
+                    letterSpacing: "5px",
+                    color: isHovered && !isDisabled
+                      ? "#4af0e0"
+                      : "rgba(215,232,230,0.88)",
+                    textShadow: isHovered && !isDisabled
+                      ? "0 0 16px rgba(74,240,224,0.7), 0 0 4px rgba(74,240,224,0.4)"
+                      : "0 1px 8px rgba(0,0,0,1), 0 0 2px rgba(0,0,0,1)",
+                    transition: "all 0.2s ease",
+                  }}>{item.label}</span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Soft line below */}
+          <div style={{
+            width: "clamp(160px, 22vw, 300px)",
+            height: "1px",
+            background: "linear-gradient(90deg, transparent, rgba(74,240,224,0.22), transparent)",
+          }}/>
+
         </div>
 
         {/* Version */}
@@ -248,7 +269,7 @@ export default function TitleScreen({ onNewGame, onContinue }) {
           position: "absolute", bottom: "16px", right: "20px",
           fontFamily: "'Share Tech Mono', monospace",
           fontSize: "8px", letterSpacing: "2px",
-          color: "rgba(74,240,224,0.25)",
+          color: "rgba(74,240,224,0.2)",
           opacity: phase >= 4 ? 1 : 0,
           transition: "opacity 1s ease",
         }}>v0.1.0 — ACT 1 PROLOGUE</div>
@@ -258,7 +279,7 @@ export default function TitleScreen({ onNewGame, onContinue }) {
           position: "absolute", bottom: "16px", left: "20px",
           fontFamily: "'Share Tech Mono', monospace",
           fontSize: "8px", letterSpacing: "2px",
-          color: "rgba(74,240,224,0.25)",
+          color: "rgba(74,240,224,0.2)",
           opacity: phase >= 4 ? 1 : 0,
           transition: "opacity 1s ease",
         }}>DISTRICT 7 — AETHERMARCH</div>
@@ -267,3 +288,5 @@ export default function TitleScreen({ onNewGame, onContinue }) {
     </div>
   );
 }
+
+    
