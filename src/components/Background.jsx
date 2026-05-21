@@ -56,6 +56,8 @@ const POSITION_MAP = {
   "battle":       "center center",
   "flashback":    "center center",
   "bar":          "center bottom",
+  "road-east-day":   "left center",
+  "road-east-night": "left center",
 };
 
 const DEFAULT_POSITION = "center center";
@@ -74,7 +76,7 @@ export default function Background({ id }) {
           position: "absolute",
           inset: 0,
           backgroundImage: `url("${imageSrc}")`,
-          backgroundSize: "cover",
+          backgroundSize: "auto 100%",
           backgroundPosition: position,
           backgroundRepeat: "no-repeat",
         }}/>
