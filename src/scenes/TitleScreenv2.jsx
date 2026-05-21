@@ -1,5 +1,5 @@
 // ─── CHRONICLES OF AETHERMARCH ───────────────────────────────────────────────
-// TitleScreen.jsx — Session 4 — horizontal menu final, 100% zoom tuned
+// TitleScreen.jsx — Session 3 revamp v3
 
 import { useState, useEffect } from "react";
 import { useAudio, stopAudio, TRACKS } from "../hooks/useAudio";
@@ -61,10 +61,10 @@ export default function TitleScreen({ onNewGame, onContinue }) {
   }
 
   const menuItems = [
-    { label: "BEGIN CHRONICLE",  action: () => fadeOutAndGo(onNewGame)  },
-    { label: "RESUME RECORD",    action: () => fadeOutAndGo(onContinue) },
-    { label: "SETTINGS",         action: null },
-    { label: "CREDITS",          action: null },
+    { label: "NEW GAME",  action: () => fadeOutAndGo(onNewGame)  },
+    { label: "CONTINUE",  action: () => fadeOutAndGo(onContinue) },
+    { label: "SETTINGS",  action: null },
+    { label: "CREDITS",   action: null },
   ];
 
   return (
@@ -79,8 +79,8 @@ export default function TitleScreen({ onNewGame, onContinue }) {
       <div style={{
         position: "fixed", inset: 0,
         backgroundImage: 'url("/art/title-screen-bg.png")',
-        backgroundSize: "cover",
-        backgroundPosition: "center 10%",
+        backgroundSize: "85%",
+        backgroundPosition: "center 0%",
         backgroundRepeat: "no-repeat",
         opacity: phase >= 1 ? 0.9 : 0,
         transition: "opacity 2.5s ease",
@@ -144,7 +144,12 @@ export default function TitleScreen({ onNewGame, onContinue }) {
         background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)",
       }}/>
 
-      {/* ── CHRONICLES OF ── */}
+      {/* ── CHRONICLES OF ──
+          Sits just above the painted AETHERMARCH logo.
+          The logo text in the image lives roughly 35–55% down the screen.
+          top: 33% lands us just above its upper edge.
+          translateX(-50%) centers it, slight tilt keeps it organic.
+      ── */}
       <div style={{
         position: "absolute",
         top: "33%",
@@ -174,7 +179,7 @@ export default function TitleScreen({ onNewGame, onContinue }) {
         paddingBottom: "8vh",
       }}>
 
-        {/* Menu — horizontal centered */}
+        {/* Menu — atmospheric, no hard box */}
         <div style={{
           opacity: phase >= 4 ? 1 : 0,
           transform: phase >= 4 ? "translateY(0)" : "translateY(12px)",
@@ -224,7 +229,7 @@ export default function TitleScreen({ onNewGame, onContinue }) {
                     }}/>
                   )}
 
-                  {/* Hover glow */}
+                  {/* Hover — soft radial glow, no box */}
                   {isHovered && !isDisabled && (
                     <div style={{
                       position: "absolute", inset: "-6px -10px",
@@ -283,6 +288,3 @@ export default function TitleScreen({ onNewGame, onContinue }) {
     </div>
   );
 }
-
-
-    

@@ -5,6 +5,7 @@ import { useState } from "react";
 import Scene01 from "./scenes/Scene01";
 import Scene02 from "./scenes/Scene02";
 import Scene03 from "./scenes/Scene03";
+import Scene04 from "./scenes/Scene04";
 import TitleScreen from "./scenes/TitleScreen";
 
 // ── GLOBAL STYLES & FONTS ─────────────────────────────────────────────────────
@@ -80,7 +81,11 @@ export default function App() {
   }
 
   if (screen === "scene03") {
-    return <Scene03 onComplete={() => setScreen("title")}/>;
+    return <Scene03 onComplete={() => setScreen("scene04")}/>;
+  }
+
+  if (screen === "scene04") {
+    return <Scene04 onComplete={() => setScreen("title")}/>;
   }
 
   // TODO: Add title screen, job select, world map, battle, scene02 etc.

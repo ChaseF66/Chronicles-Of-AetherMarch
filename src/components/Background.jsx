@@ -13,6 +13,8 @@ const IMAGE_MAP = {
   "substation":        "/art/District 7 v1.png",
   "substation-dark":   "/art/District 7 v1.png",
   "district-streets":  "/art/District 7 v3.png",
+  "road-east-day":   "/art/road-east-day.png",
+  "road-east-night": "/art/road-east-night.png",
 
   // Workshop / interior
   "workshop":          "/art/District 7 v4.png",
